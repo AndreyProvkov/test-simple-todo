@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+
+    <script type="text/babel">
+      class Task extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            edit: false,
+          };
+          this.edit = this.edit.bind(this);
+          this.save = this.save.bind(this);
+        }
+
+        edit() {
+          this.setState({ edit: true });
+        }
+
+        save() {
+          this.props.update(this.refs.newTxt.value, this.props.index);
+          this.setState({ edit: false });
+        }
+
+        remove = () => {
+          this.props.deleteBlock(this.props.index);
+        };
+
+        rendNorm() {
+          return (
+            <div className="box">
+              <div className="text">{this.props.children}</div>
+              <button onClick={this.edit} className="btn light">
+                Edit
+              </button>
+              <button onClick={this.remove} className="btn red">
+                Delete
+              </button>
+            </div>
+          );
+        }
+
+        rendEdit() {
+          return (
+            <div className="box">
+              <textarea
+                ref="newTxt"
+                defaultValue={this.props.children}
+              ></textarea>
+              <button onClick={this.save} className="btn success">
+                Save
+              </button>
+            </div>
+          );
+        }
+
+        render() {
+          if (this.state.edit) {
+            return this.rendEdit();
+          } else {
+            return this.rendNorm();
+          }
+        }
+      }
+
+      class Field extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            tasks: [],
+          };
+        }
+
+        add = () => {
+          let text = this.refs.addTxt.value;
+          let arr = this.state.tasks;
+          arr.push(text);
+          this.setState({ tasks: arr });
+        };
+
+        deleteBlock = (i) => {
+          let arr = this.state.tasks;
+          arr.splice(i, 1);
+          this.setState({ tasks: arr });
+        };
+
+        updateText = (text, i) => {
+          let arr = this.state.tasks;
+          arr[i] = text;
+          this.setState({ tasks: arr });
+        };
+
+        eachTask = (item, i) => {
+          return (
+            <Task
+              key={i}
+              index={i}
+              update={this.updateText}
+              deleteBlock={this.deleteBlock}
+            >
+              {item}
+            </Task>
+          );
+        };
+
+        render() {
+          return (
+            <div className="field">
+              <textarea ref="addTxt" defaultValue=""></textarea>
+              <button onClick={this.add.bind(null, "Task")} className="btn new">
+                Add
+              </button>
+              {this.state.tasks.map(this.eachTask)}
+            </div>
+          );
+        }
+      }
+
+      const place = document.getElementById("example");
+
+      ReactDOM.createRoot(place).render(<Field />);
+    </script>
+
+    <!-- <div id="root"></div>
+    <script type="text/babel">
+    
+      function MyApp() {
+        return <h1>Hello, world!</h1>;
+      }
+
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<MyApp />);
+
+    </script> -->
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>
